@@ -22,7 +22,19 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "My Application"
-include(":app")
-// setBinding(new Binding([gradle: this]))                                // new
-println(rootProject.projectDir)
+include(":app") // new
+// println(rootProject.projectDir)
 apply(from = File(settingsDir.parentFile.toString() + "/blahblah/.android/include_flutter.groovy"))
+
+// apply from: settingsDir.parentFile.toString() + "/blahblah/.android/include_flutter.groovy"
+
+// setBinding(new Binding([gradle: this]))
+// evaluate(new File(                                                     // new
+//    settingsDir.parentFile,                                            // new
+// 'blahblah/.android/include_flutter.groovy'                   // new
+// ))
+
+// evalFile(File(settingsDir.parentFile.toString() + "/blahblah/.android/include_flutter.groovy"))
+
+// getExtensions().findByName("ext").setProperty("gradles", this)
+// apply(from = File(settingsDir.parentFile.toString() + "/blahblah/.android/include_flutter.groovy"))

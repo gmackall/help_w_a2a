@@ -1,0 +1,100 @@
+diff --git a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/build.gradle.kts b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/build.gradle.kts
+index f18e3c7917..80fc8488e9 100644
+--- a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/build.gradle.kts
++++ b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/build.gradle.kts
+@@ -51,6 +51,7 @@ android {
+ 
+ dependencies {
+ 
++    implementation(project(":flutter"))
+     implementation(libs.androidx.core.ktx)
+     implementation(libs.androidx.lifecycle.runtime.ktx)
+     implementation(libs.androidx.activity.compose)
+@@ -66,4 +67,4 @@ dependencies {
+     androidTestImplementation(libs.androidx.ui.test.junit4)
+     debugImplementation(libs.androidx.ui.tooling)
+     debugImplementation(libs.androidx.ui.test.manifest)
+-}
+\ No newline at end of file
++}
+diff --git a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/AndroidManifest.xml b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/AndroidManifest.xml
+index e013846c0f..23422bc7fe 100644
+--- a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/AndroidManifest.xml
++++ b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/AndroidManifest.xml
+@@ -23,6 +23,13 @@
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
++        <activity
++            android:name="io.flutter.embedding.android.FlutterActivity"
++            android:theme="@style/Theme.MyApplication"
++            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
++            android:hardwareAccelerated="true"
++            android:windowSoftInputMode="adjustResize"
++            />
+     </application>
+ 
+ </manifest>
+\ No newline at end of file
+diff --git a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/java/com/example/myapplication/MainActivity.kt b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/java/com/example/myapplication/MainActivity.kt
+index 21f387bd11..9d5d8f1833 100644
+--- a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/java/com/example/myapplication/MainActivity.kt
++++ b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/app/src/main/java/com/example/myapplication/MainActivity.kt
+@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.tooling.preview.Preview
+ import com.example.myapplication.ui.theme.MyApplicationTheme
++import io.flutter.embedding.android.FlutterActivity
+ 
+ class MainActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+@@ -27,11 +28,18 @@ class MainActivity : ComponentActivity() {
+                 }
+             }
+         }
++
++        startActivity(
++            FlutterActivity.createDefaultIntent(this)
++        )
+     }
+ }
+ 
+ @Composable
+-fun Greeting(name: String, modifier: Modifier = Modifier) {
++fun Greeting(
++    name: String,
++    modifier: Modifier = Modifier
++) {
+     Text(
+         text = "Hello $name!",
+         modifier = modifier
+@@ -44,4 +52,4 @@ fun GreetingPreview() {
+     MyApplicationTheme {
+         Greeting("Android")
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/settings.gradle.kts b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/settings.gradle.kts
+index 7e677746ee..9fe2c882a2 100644
+--- a/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/settings.gradle.kts
++++ b/dev/integration_tests/pure_android_host_apps/host_app_kotlin_gradle_dsl/settings.gradle.kts
+@@ -12,13 +12,15 @@ pluginManagement {
+     }
+ }
+ dependencyResolutionManagement {
+-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
++    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+     repositories {
+         google()
+         mavenCentral()
++        val flutterStorageUrl = System.getenv("FLUTTER_STORAGE_BASE_URL") ?: "https://storage.googleapis.com"
++        maven("$flutterStorageUrl/download.flutter.io")
+     }
+ }
+ 
+ rootProject.name = "My Application"
+ include(":app")
+- 
+\ No newline at end of file
++apply(from = File(settingsDir.parentFile.toString() + "/flutter_module/.android/include_flutter.groovy"))

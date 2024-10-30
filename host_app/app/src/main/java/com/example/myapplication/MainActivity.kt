@@ -30,7 +30,9 @@ class MainActivity : ComponentActivity() {
         }
 
         startActivity(
-            FlutterActivity.createDefaultIntent(this),
+            FlutterActivity
+                .withCachedEngine("my_engine_id")
+                .build(this),
         )
     }
 }
